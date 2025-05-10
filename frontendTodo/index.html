@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>todo application</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.6/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <!-- for signup page -->
+    <div id="signup">
+        <h2>Sign up</h2>
+        <input type="text" id="name" placeholder="Name" class="inputs"><br>
+        <input type="email" id="email" placeholder="Email" class="inputs"><br>
+        <input type="password" id="password" placeholder="Password" class="inputs"><br>
+        <button id="signUpBtn" onclick="signup()" class="btn">Sign up</button>
+    </div>
+    <div id="already-signed-up">Already have an account? <span id="to-signin">Sign in</span></div>
+
+    <!-- for signin page -->
+    <div id="signin">
+        <h2>Sign in</h2>
+        <input type="email" id="email2" placeholder="Email" class="inputs">
+        <input type="password" id="password2" placeholder="Password" class="inputs">
+        <button id="signInBtn" onclick="signin()" class="btn">Sign in</button>
+    </div>
+
+    <!-- todos -->
+     <div id="todoPage"> 
+    <div id="todo-list">
+        <div id="todo-heading">Todo List</div>
+        <div id="todos">
+            <input type="text" id="todo" placeholder="Add a new task" >
+            <button id="createTodo" onclick="todo()">Add todo</button>
+        </div>
+        <div id="getTodo"></div>
+    </div>
+    <button id="signout" onclick="signout()" class="btn">Sign out</button>
+</div>
+
+    <script>
+        const toSignin = document.getElementById("to-signin");
+        toSignin.addEventListener("click", displayProp);
+        function displayProp(){
+            document.getElementById("signup").style.display = "none";
+            document.getElementById("already-signed-up").style.display = "none";
+            document.getElementById("signin").style.display = "block";
+            document.getElementById("todoPage").style.display = "none";
+
+        }
+
+        function signinDisplayProp(){
+            document.getElementById("signin").style.display = "none";
+            document.getElementById("todoPage").style.display = "block";
+
+        }
+    
+        async function signup() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const res = await axios.post("http://localhost:8000/signup", {
+                name: name,
+                email: email,
+                password: password
+            });
+            alert(res.data.message);
+            displayProp();
+        }
+        async function signin() {
+
+            const email = document.getElementById("email2").value;
+            const password = document.getElementById("password2").value;
+
+            const res = await axios.post("http://localhost:8000/signin", {
+                email: email,
+                password: password
+            });
+            console.log(res.data.token)
+            localStorage.setItem("token", res.data.token);
+            alert(res.data.message);
+            signinDisplayProp();    
+            getTodo();
+        }
+        async function todo() {
+            const token = localStorage.getItem("token");
+            const title = document.getElementById("todo").value;
+
+            const res = await axios.post("http://localhost:8000/todo", {
+                title: title,
+                done: false
+            }, {
+                headers: {
+                    "authorization": token
+                }
+            });
+            getTodo();
+        }
+        async function getTodo() {
+            const token = localStorage.getItem("token");
+            const user = await axios.get("http://localhost:8000/getTodo", {
+                headers: {
+                    "authorization": token
+                }
+            });
+
+            const todos = user.data;
+            const titlesHtml = todos.user.map(todo => `<div class = "all-todos"><input type="checkbox" id="done" name="isDone">${todo.title}<i class="fa fa-close" onclick="deleteTodo('${todo._id}')"></i></div>`).join("<br>");
+            document.getElementById("getTodo").innerHTML = titlesHtml;
+        }
+
+        async function deleteTodo(todoId) {
+            const token = localStorage.getItem("token");
+
+            const user = await axios.post("http://localhost:8000/delete", {
+                todoId
+            },
+             {
+                headers : {
+                "authorization" : token
+                }
+            }
+        );
+        alert(user.data.message);
+        getTodo();
+        }
+        async function signout() {
+            localStorage.removeItem("token");
+            displayProp();
+        }
+    </script>
+</body>
+
+</html>
