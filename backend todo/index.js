@@ -5,8 +5,9 @@ const cors = require("cors");
 const {userModel, todoModel} = require("./db");
 const {z} = require("zod");
 const bcrypt = require("bcrypt");
-
-mongoose.connect("mongodb+srv://bagorakhushi1212:6ntj9Unc5Xgovksi@cluster0.hltv2.mongodb.net/newTodo");
+const port = process.env.PORT || 8000;
+require('dotenv').config();
+mongoose.connect(process.env.MONGO_URI);
 
 const app = express();
 const JWT_SECRET = "raaz";
@@ -128,4 +129,4 @@ function auth(req, res, next){
         res.status(404).send("error");
     }
 }
-app.listen(8000);
+app.listen(port);
