@@ -64,7 +64,7 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
-            const res = await axios.post("http://localhost:8000/signup", {
+            const res = await axios.post("https://todo-ckhi.onrender.com/signup", {
                 name: name,
                 email: email,
                 password: password
@@ -77,7 +77,7 @@
             const email = document.getElementById("email2").value;
             const password = document.getElementById("password2").value;
 
-            const res = await axios.post("http://localhost:8000/signin", {
+            const res = await axios.post("https://todo-ckhi.onrender.com/signin", {
                 email: email,
                 password: password
             });
@@ -91,7 +91,7 @@
             const token = localStorage.getItem("token");
             const title = document.getElementById("todo").value;
 
-            const res = await axios.post("http://localhost:8000/todo", {
+            const res = await axios.post("https://todo-ckhi.onrender.com/todo", {
                 title: title,
                 done: false
             }, {
@@ -103,7 +103,7 @@
         }
         async function getTodo() {
             const token = localStorage.getItem("token");
-            const user = await axios.get("http://localhost:8000/getTodo", {
+            const user = await axios.get("https://todo-ckhi.onrender.com/getTodo", {
                 headers: {
                     "authorization": token
                 }
@@ -117,7 +117,7 @@
         async function deleteTodo(todoId) {
             const token = localStorage.getItem("token");
 
-            const user = await axios.post("http://localhost:8000/delete", {
+            const user = await axios.post("https://todo-ckhi.onrender.com/delete", {
                 todoId
             },
              {
